@@ -10,31 +10,37 @@ const uuid = require('uuid/v4')
 const User = require('../models/User')
 const Refresh = require('../models/Refresh')
 
-const config = require('../../config')
+const config = require('../config')
+const hError = require('../helpers/error')
 
 
 const router = new Router()
 
 
 const tokens = async (userId) => {
-  const token = jwt.sign({ id: userId }, config.secret)
+  const token = jwt.sign({ id: userId }, config.jwtSecret)
   const refresh = uuid()
-  await Refresh.add({ refresh, userId })
+  await (new Refresh({ refresh, userId })).save(err => err && console.log('Refresh: Error on save!'))
   return { token, refresh }
 }
 
-const handleError = (status, message) => {
-  const error = new Error()
-  error.status = status
-  error.message = message
-  throw error
-}
+router.post('/signup', bodyParser(), async ctx => {
+  const { email, password } = ctx.request.body
+  const candidate = await User.findOne({ email })
+  if (candidate) return res.status(400).json({ message: 'Such user is already exist'})
+  
+  const hashedPassword = await bcrypt.hash(password, 12)
+  const user = new User({ email, password: hashedPassword })
+  
+  ctx.body = await user.save() //({ message: 'New user created' })
+})
+
 
 router.post('/signin', bodyParser(), async ctx => {
   const { email, password } = ctx.request.body
   const user = await User.findOne({ email })
-  if (!user) return handleError(403, 'User not found')
-  if (!bcrypt.compare(password, user.password)) return handleError(403, 'Password is invalid')
+  if (!user) return hError(403, 'User not found')
+  if (!bcrypt.compare(password, user.password)) return hError(403, 'Password is invalid')
   ctx.body = await tokens(user.id)
 })
 
@@ -43,13 +49,13 @@ router.post('/refresh', bodyParser(), async ctx => {
   const { userId } = await Refresh.findOne({ refresh })
   if (!userId) return
 
-  await Refresh.remove({ token: refresh })
+  await Refresh.deleteOne({ userId, refresh })
   ctx.body = await tokens(userId)
 })
 
 router.post('/signout', jwtMiddleware({ secret: config.jwtSecret }), async ctx => {
   const { id: userId } = ctx.state.user 
-  await Refrash.remove({ userId })
+  await Refresh.deleteMany({ userId })
   ctx.body = { success: true }
 })
 

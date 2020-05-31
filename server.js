@@ -1,23 +1,9 @@
-const Koa = require('koa')
-const Router = require('koa-router')
-const jwtMiddleware = require('koa-jwt')
-
+require('./mongoose')
 const config = require('./config')
+const app = require('./app')
 
-function createApp() {
-  const koa = new Koa()
-  const router = new Router()
-  router.get('/', ctx => { ctx.body = 'ok' })
-  router.use('/auth', require('./routes/auth').routes())
-  router.use(jwtMiddleware({ secret: config.jwtSecret }))
-  router.use('/user', require('./routes/user').routes())
+if (!module.parent) app.listen(config.port)
 
-  koa.use(router.allowedMethods())
-  koa.use(router.routes())
-
-  return koa
-}
-
-if (!module.parent) createApp().listen(config.port)
-
-module.exports = createApp
+// Easily use app.listen(config.port) doesn't work because it starts listening to one port. If you try to write many test files, you'll get an error that says "port in use".
+// You want to allow each test file to start a server on their own. To do this, you need to export app without listening to it.
+module.exports = app

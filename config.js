@@ -15,6 +15,7 @@ const config = {
   mongo: { uri: requireProcessEnv('MONGODB_URI'), options: { db: { safe: true } } },
   connection: './data',
 }
+
 if (config.env === 'development') config.mongo.options.debug = true
 
 module.exports = config
