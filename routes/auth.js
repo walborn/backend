@@ -5,8 +5,8 @@ const bcrypt = require('bcryptjs')
 const uuid = require('uuid/v4')
 
 
-const User = require('../model/User')
-const Refresh = require('../model/Refresh')
+const User = require('../model/user')
+const Refresh = require('../model/refresh')
 
 const config = require('../config')
 const hError = require('../helpers/error')

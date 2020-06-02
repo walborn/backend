@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 mongoose.connect(
-  'mongodb://127.0.0.1/model__User', 
+  'mongodb://127.0.0.1/model__user', 
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -8,8 +8,17 @@ mongoose.connect(
   },
 )
 
-const User = require('../../model/User')
+const User = require('../../model/user')
 
+
+// const connection = mongoose.connection
+// connection.once("open", function() {
+// console.log("*** MongoDB got connected ***");
+// console.log(`Our Current Database Name : ${connection.db.databaseName}`);
+// mongoose.connection.db.dropDatabase(
+// console.log(`${connection.db.databaseName} database dropped.`)
+// );
+// });
 
 describe('User model test', () => {
 

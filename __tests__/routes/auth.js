@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const sign = require('../../helpers/sign')
 const app = require('../../app')
-const User = require('../../model/User')
+const User = require('../../model/user')
 
 
 mongoose.connect(
@@ -13,6 +13,7 @@ mongoose.connect(
     useCreateIndex: true,
   },
 )
+
 
 // Test the JWT authentication
 describe('Auth routes:', () => {

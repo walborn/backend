@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const auth = require('../middleware/auth')
-const User = require('../model/User')
+const User = require('../model/user')
 
 const hError = require('../helpers/error')
 

@@ -1,14 +1,14 @@
-const mongoose = require ('mongoose')
-const { mongo } = require('./config')
+// const mongoose = require ('mongoose')
+// const { mongo } = require('./config')
 
-mongoose.connect(
-  mongo.uri,
-  {
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  },
-)
+// mongoose.connect(
+//   mongo.uri,
+//   {
+//     useCreateIndex: true,
+//     useUnifiedTopology: true,
+//     useNewUrlParser: true,
+//   },
+// )
 
 // mongoose.connection.on('error', (err) => {
 //   console.log('\x1b[31m%s\x1b[0m', `-- Error -> MongoDB connection to: ${err}`)
