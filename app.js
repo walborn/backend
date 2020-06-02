@@ -1,17 +1,18 @@
-const Koa = require('koa')
-const Router = require('koa-router')
-const jwtMiddleware = require('koa-jwt')
+const express = require('express')
+const cors = require('cors')
+const compression = require('compression')
+const jwtMiddleware = require('express-jwt')
 
 const config = require('./config')
 
-const koa = new Koa()
-const router = new Router()
-router.get('/', ctx => { ctx.body = 'ok' })
-router.use('/auth', require('./routes/auth').routes())
-router.use(jwtMiddleware({ secret: config.jwtSecret }))
-router.use('/user', require('./routes/user').routes())
+const app = express()
 
-koa.use(router.allowedMethods())
-koa.use(router.routes())
+app.use(cors())
+app.use(compression())
+app.use(express.json({ extended: true }))
+app.use('/auth', require('./routes/auth'))
+app.use(jwtMiddleware({ secret: config.jwtSecret }))
+app.use('/user', require('./routes/user'))
 
-module.exports = koa
+
+module.exports = app
