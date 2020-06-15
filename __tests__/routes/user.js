@@ -40,7 +40,7 @@ describe('User routes:', () => {
   })
 
   it('get user by valid id', async () => {
-    const user = new User({ email: 'test@test.com', password: 'qweqwe' })
+    const user = new User({ email: 'test@test.com', password: 'catwalk' })
     const created = await user.save()
     
     await request

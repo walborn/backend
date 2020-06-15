@@ -31,7 +31,6 @@ router.post('/signup', async (req, res) => {
     res.json(await user.save()) // ({ message: 'New user created' })
   } catch {
     res.status(403).json('Credentials are not valid')
-  
   }
 })
 

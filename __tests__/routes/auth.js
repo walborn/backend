@@ -14,7 +14,6 @@ mongoose.connect(
   },
 )
 
-
 // Test the JWT authentication
 describe('Auth routes:', () => {
 
@@ -37,7 +36,7 @@ describe('Auth routes:', () => {
   it('sign up', async () => {
     await request
       .post('/auth/signup')
-      .send({ email: 'test@test.com', password: 'qweqwe' })
+      .send({ email: 'test@test.com', password: 'catwalk' })
       .expect(200)
 
     const user = await User.findOne({ email: 'test@test.com' })
@@ -46,12 +45,12 @@ describe('Auth routes:', () => {
 
   // User can successfully sign in
   it('sign in', async () => {
-    const user = new User({ email: 'test@test.com', password: 'qweqwe' })
+    const user = new User({ email: 'test@test.com', password: 'catwalk' })
     await user.save()
   
     const { token, refresh } = (await request
       .post('/auth/signin')
-      .send({ email: 'test@test.com', password: 'qweqwe' })
+      .send({ email: 'test@test.com', password: 'catwalk' })
       .expect(200)).body
     
     expect(typeof token).toBe('string')
@@ -86,12 +85,12 @@ describe('Auth routes:', () => {
 
   // User can get new access token using refresh token
   it('get new access token using refresh', async () => {
-    const user = new User({ email: 'test@test.com', password: 'qweqwe' })
+    const user = new User({ email: 'test@test.com', password: 'catwalk' })
     await user.save()
   
     const { refresh } = (await request
       .post('/auth/signin')
-      .send({ email: 'test@test.com', password: 'qweqwe' })
+      .send({ email: 'test@test.com', password: 'catwalk' })
       .expect(200)).body
 
     const res = await request
@@ -113,12 +112,12 @@ describe('Auth routes:', () => {
 
   // User can use refresh token only once
   it('each refresh can be used only once', async () => {
-    const user = new User({ email: 'test@test.com', password: 'qweqwe' })
+    const user = new User({ email: 'test@test.com', password: 'catwalk' })
     await user.save()
   
     const { refresh } = (await request
       .post('/auth/signin')
-      .send({ email: 'test@test.com', password: 'qweqwe' })
+      .send({ email: 'test@test.com', password: 'catwalk' })
       .expect(200)).body
 
     await request
@@ -134,12 +133,12 @@ describe('Auth routes:', () => {
 
   // Refresh tokens become invalid on sign out
   it('spoil refresh while sign out', async () => {
-    const user = new User({ email: 'test@test.com', password: 'qweqwe' })
+    const user = new User({ email: 'test@test.com', password: 'catwalk' })
     await user.save()
   
     const { token, refresh } = (await request
       .post('/auth/signin')
-      .send({ email: 'test@test.com', password: 'qweqwe' })
+      .send({ email: 'test@test.com', password: 'catwalk' })
       .expect(200)).body
 
     await request
@@ -155,20 +154,20 @@ describe('Auth routes:', () => {
   
   // Multiple refresh tokens are valid
   it('multiple refresh', async () => {
-    const user = new User({ email: 'test@test.com', password: 'qweqwe' })
+    const user = new User({ email: 'test@test.com', password: 'catwalk' })
     await user.save()
 
     const refreshes = [
       (
         await request
           .post('/auth/signin')
-          .send({ email: 'test@test.com', password: 'qweqwe' })
+          .send({ email: 'test@test.com', password: 'catwalk' })
           .expect(200)
       ).body.refresh,
       (
         await request
           .post('/auth/signin')
-          .send({ email: 'test@test.com', password: 'qweqwe' })
+          .send({ email: 'test@test.com', password: 'catwalk' })
           .expect(200)
       ).body.refresh,
     ]
