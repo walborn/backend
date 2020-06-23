@@ -7,15 +7,26 @@ const requireProcessEnv = (name) => {
   throw new Error(`You must set the ${name} environment variable`)
 }
 
-const config = {
+module.exports = {
   env: process.env.NODE_ENV || 'development',
-  port: process.env.PORT,
-  ip: process.env.IP,
-  jwtSecret: requireProcessEnv('JWT_SECRET'),
-  mongo: { uri: requireProcessEnv('MONGODB_URI'), options: { db: { safe: true } } },
-  connection: './data',
+  port: requireProcessEnv('PORT'),
+  jwt: {
+    secret: requireProcessEnv('JWT_SECRET'),
+    token: {
+      access: {
+        exrpireIn: '10s',
+      },
+      refresh: {
+        exrpireIn: '30s',
+      }
+    },
+  },
+  mongo: {
+    uri: requireProcessEnv('MONGODB_URI'),
+    settings:   {
+      useCreateIndex: true,
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    },
+  },
 }
-
-if (config.env === 'development') config.mongo.options.debug = true
-
-module.exports = config

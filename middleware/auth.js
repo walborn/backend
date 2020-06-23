@@ -1,15 +1,19 @@
 const jwt = require('jsonwebtoken')
+const { secret } = require('../config').jwt
 
-module.exports = async (req, res, next) => {
-  if (req.method === 'OPTIONS') return next()
 
-  try {
-    const token = req.headers.authorization.slice(7) // Bearer <token>
-    if (!token) res.status(401).json({ message: `You are not authorized.` })
+module.exports = (req, res, next) => {
+  // if (req.method === 'OPTIONS') return next()
+
+  const access = req.get('Authorization')
+
+  if (!access) res.status(401).json({ message: 'Access token not provided!' })
   
-    req.user = jwt.verify(token, process.env.JWT_SECRET)
-    next()
+  try {
+    jwt.verify(access.replace(/^Bearer /, ''), secret)
   } catch (e) {
-    res.status(401).json({ message: 'You are not authorized!' })
+    if (e instanceof jwt.TokenExpiredError) res.status(401).json({ message: 'Access token expired!' })
+    if (e instanceof jwt.JsonWebTokenError) res.status(401).json({ message: 'Invalid access token!' })
   }
+  next()
 }

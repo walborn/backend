@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const User = require('./user')
+
 mongoose.connect(
   'mongodb://127.0.0.1/model__user', 
   {
@@ -8,17 +10,14 @@ mongoose.connect(
   },
 )
 
-const User = require('../../model/user')
 
-
-const connection = mongoose.connection
-connection.once("open", function() {
-console.log("*** MongoDB got connected ***");
-console.log(`Our Current Database Name : ${connection.db.databaseName}`);
-mongoose.connection.db.dropDatabase(
-console.log(`${connection.db.databaseName} database dropped.`)
-);
-});
+mongoose.connection.once('open', () => {
+  console.log('*** MongoDB got connected ***')
+  console.log(`Database : ${mongoose.connection.db.databaseName}`)
+  mongoose.connection.db.dropDatabase(
+    console.log(`${mongoose.connection.db.databaseName} database has been dropped.`)
+  )
+})
 
 describe('User model test', () => {
 
@@ -39,7 +38,6 @@ describe('User model test', () => {
     const user = new User({ email: 'created@test.com', password: 'createdtest' })
     const created = await user.save()
     expect(created.email).toBe('created@test.com')
-
   })
 
   it('fetch user', async () => {

@@ -1,19 +1,13 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const sign = require('../../helpers/sign')
-const app = require('../../app')
-const User = require('../../model/user')
+const tokens = require('../helpers/tokens')
+const app = require('../app')
+const User = require('../model/user')
+const { mongo } = require('../config')
 
-const token = `Bearer ${sign({ id: 1 })}`
+mongoose.connect('mongodb://127.0.0.1/routes__user', mongo.settings)
+const token = `Bearer ${tokens.access.create({ uid: 'test' })}`
 
-mongoose.connect(
-  'mongodb://127.0.0.1/routes__user', 
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  },
-)
 
 describe('User routes:', () => {
 
