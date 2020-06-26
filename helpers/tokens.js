@@ -9,18 +9,18 @@ const access = {
 }
 
 const refresh = {
-  create: (expiresIn = token.refresh.exrpireIn) => jwt.sign({ id: uuid() }, secret, { expiresIn }),
-  update: ({ uid, prv, nxt }) => Refresh
-    .findOneAndRemove({ uid, token: prv }).exec()
-    .then(() => Refresh.create({ uid, token: nxt })),
-  remove: ({ uid, token }) => Refresh
-    .findOneAndRemove({ uid, token }).exec(),
-  verify: token => jwt.verify(token, secret)
+  create: ({ uid, expiresIn = token.refresh.exrpireIn }) => jwt.sign({ uid, value: uuid() }, secret, { expiresIn }),
+  update: ({ uid, prev, next }) => Refresh
+    .findOneAndRemove({ uid, value: prev }).exec()
+    .then(() => Refresh.create({ uid, value: next })),
+  remove: ({ value }) => Refresh
+    .findOneAndRemove({ value }).exec(),
+  verify: value => jwt.verify(value, secret)
 }
 
-const pair = ({ uid, token }) => refresh
-  .update({ uid, prv: token, nxt: refresh.create() })
-  .then(({ token }) => ({ access: access.create({ uid }), refresh: token }))
+const pair = ({ uid, value }) => refresh
+  .update({ uid, prev: value, next: refresh.create({ uid }) })
+  .then(({ value }) => ({ access: access.create({ uid }), refresh: value }))
 
 
 module.exports = { access, refresh, pair }

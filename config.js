@@ -7,6 +7,7 @@ const requireProcessEnv = (name) => {
   throw new Error(`You must set the ${name} environment variable`)
 }
 
+
 module.exports = {
   env: process.env.NODE_ENV || 'development',
   port: requireProcessEnv('PORT'),
@@ -14,10 +15,10 @@ module.exports = {
     secret: requireProcessEnv('JWT_SECRET'),
     token: {
       access: {
-        exrpireIn: '10s',
+        exrpireIn: '30s',
       },
       refresh: {
-        exrpireIn: '30s',
+        exrpireIn: '300s',
       }
     },
   },
@@ -27,6 +28,7 @@ module.exports = {
       useCreateIndex: true,
       useUnifiedTopology: true,
       useNewUrlParser: true,
+      useFindAndModify: false,
     },
   },
 }

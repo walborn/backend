@@ -5,23 +5,21 @@ const app = require('../app')
 const User = require('../model/user')
 const { mongo } = require('../config')
 
-mongoose.connect('mongodb://127.0.0.1/routes__user', mongo.settings)
-const token = `Bearer ${tokens.access.create({ uid: 'test' })}`
-
 
 describe('User routes:', () => {
 
   let server, request
-  beforeAll(() => {
+  beforeAll(async () => {
+    await mongoose.connect('mongodb://127.0.0.1/routes__user', mongo.settings)
     server = app.listen(3002)
     request = supertest(server)
   })
-
   beforeEach(async () => {
     await User.deleteMany({})
   })
 
   afterAll(async done => {
+    await User.drop()
     await mongoose.connection.close()
     server.close(done)
   })
@@ -29,26 +27,27 @@ describe('User routes:', () => {
   it('get user list', async () => {
     await request
       .get('/user/list')
-      .set('Authorization', token)
+      .set('Authorization', `Bearer ${tokens.access.create({ uid: 'alberteinstein' })}`)
       .expect(200)
   })
 
   it('get user by valid id', async () => {
-    const user = new User({ email: 'test@test.com', password: 'catwalk' })
-    const created = await user.save()
-    
+    const user = new User({ email: 'stevejobs@apple.com', password: 'StayHungryStayFoolish' })
+    const { _id: uid } = await user.save()
+
     await request
-      .get(`/user/item/${created._id}`)
-      .set('Authorization', token)
+      .get(`/user/item/${uid}`)
+      .set('Authorization', `Bearer ${tokens.access.create({ uid })}`)
       .expect(200)
   })
 
   it('get user by invalid id', async () => {
-    const res = await request
-      .get('/user/item/2020')
-      .set('Authorization', token)
+    const user = new User({ email: 'stevejobs@apple.com', password: 'StayHungryStayFoolish' })
+    const { _id: uid } = await user.save()
+  
+    await request
+      .get(`/user/item/${mongoose.Types.ObjectId()}`)
+      .set('Authorization', `Bearer ${tokens.access.create({ uid })}`)
       .expect(404)
-
-    expect(res.body).toBe('User not found')
   })
 })

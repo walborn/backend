@@ -1,32 +1,19 @@
 const mongoose = require('mongoose')
 const User = require('./user')
+const { mongo } = require('../config')
 
-mongoose.connect(
-  'mongodb://127.0.0.1/model__user', 
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  },
-)
-
-
-mongoose.connection.once('open', () => {
-  console.log('*** MongoDB got connected ***')
-  console.log(`Database : ${mongoose.connection.db.databaseName}`)
-  mongoose.connection.db.dropDatabase(
-    console.log(`${mongoose.connection.db.databaseName} database has been dropped.`)
-  )
-})
 
 describe('User model test', () => {
+  beforeAll(async () => {
+    await mongoose.connect('mongodb://127.0.0.1/routes__auth', mongo.settings)
+  })
 
   beforeEach(async () => {
-    await User.deleteMany({})
+    await User.deleteMany()
   })
 
   afterAll(async () => {
-    await User.deleteMany({})
+    await User.drop()
     await mongoose.connection.close()
   })
 
@@ -42,9 +29,15 @@ describe('User model test', () => {
 
   it('fetch user', async () => {
     const user = new User({ email: 'fetched@test.com', password: 'fetchedtest' })
-    await user.save()
-    const fetched = await User.findOne({ email: 'fetched@test.com' })
+    const { id } = await user.save()
+    console.log(id)
+    const fetched = await User.findById(id)
     expect(fetched.email).toBe('fetched@test.com')
+  })
+
+  it('fetch not existed user', async () => {
+    const notfound = await User.findById(mongoose.Types.ObjectId())
+    expect(notfound).toBe(null)
   })
 
   it('update user', async () => {

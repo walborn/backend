@@ -1,18 +1,10 @@
-const express = require('express')
-const bodyParser = require('body-parser')
 const mongoose = require ('mongoose')
-const { secret } = require('./config').jwt
-
-const app = express()
-app.use(bodyParser.json())
-
-app.use(express.json({ extended: true }))
-app.use('/auth', require('./routes/auth'))
-app.use(jwtMiddleware({ secret }))
-app.use('/user', require('./routes/user'))
+const config = require('./config')
+const app = require('./app')
+const setup = require('./setup')
 
 
 mongoose
   .connect(config.mongo.uri, config.mongo.settings)
+  .then(setup)
   .then(() => app.listen(config.port))
-  .catch(err => console.error(`Error connecting to mongo: ${config.mongo.uri}`, err))
