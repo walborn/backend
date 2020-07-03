@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const uuid = require('uuid/v4')
+const { v4 } = require('uuid')
 const Refresh = require('../model/refresh')
 const { secret, token } = require('../config').jwt
 
@@ -9,18 +9,18 @@ const access = {
 }
 
 const refresh = {
-  create: ({ uid, expiresIn = token.refresh.exrpireIn }) => jwt.sign({ uid, value: uuid() }, secret, { expiresIn }),
-  update: ({ uid, prev, next }) => Refresh
-    .findOneAndRemove({ uid, value: prev }).exec()
-    .then(() => Refresh.create({ uid, value: next })),
-  remove: ({ value }) => Refresh
-    .findOneAndRemove({ value }).exec(),
+  create: ({ uid, expiresIn = token.refresh.exrpireIn }) => jwt.sign({ uid, value: v4() }, secret, { expiresIn }),
+  update: async ({ uid, prev, next }) => await Refresh
+    .findOneAndUpdate({ uid, value: prev }, { uid, value: next }, { upsert: true, new: true }),
+  remove: async ({ value }) => await Refresh
+    .findOneAndRemove({ value }),
   verify: value => jwt.verify(value, secret)
 }
 
-const pair = ({ uid, value }) => refresh
-  .update({ uid, prev: value, next: refresh.create({ uid }) })
-  .then(({ value }) => ({ access: access.create({ uid }), refresh: value }))
-
+const pair = async ({ uid, value: prev }) => {
+  const next = refresh.create({ uid })
+  await refresh.update({ uid, prev, next })
+  return { access: access.create({ uid }), refresh: next }
+}
 
 module.exports = { access, refresh, pair }
