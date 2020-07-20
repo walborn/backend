@@ -1,26 +1,26 @@
-const jwt = require('jsonwebtoken')
+const jsonwebtoken = require('jsonwebtoken')
 const { v4 } = require('uuid')
 const Refresh = require('../model/refresh')
-const { secret, token } = require('../config').jwt
+const config = require('../config')
 
 
 const access = {
-  create: ({ uid, expiresIn = token.access.exrpireIn }) => jwt.sign({ uid }, secret, { expiresIn }),
+  create: ({ uid, expiresIn = config.access.exrpireIn }) => jsonwebtoken.sign({ uid }, config.access.secret, { expiresIn }),
 }
 
 const refresh = {
-  create: ({ uid, expiresIn = token.refresh.exrpireIn }) => jwt.sign({ uid, value: v4() }, secret, { expiresIn }),
-  update: async ({ uid, prev, next }) => await Refresh
-    .findOneAndUpdate({ uid, value: prev }, { uid, value: next }, { upsert: true, new: true }),
+  create: ({ uid, expiresIn = config.refresh.exrpireIn }) => jsonwebtoken.sign({ uid, value: v4() }, config.refresh.secret, { expiresIn }),
+  update: async ({ uid, prv, nxt }) => await Refresh
+    .findOneAndUpdate({ uid, value: prv }, { uid, value: nxt }, { upsert: true, new: true }),
   remove: async ({ value }) => await Refresh
     .findOneAndRemove({ value }),
-  verify: value => jwt.verify(value, secret)
+  verify: value => jsonwebtoken.verify(value, config.refresh.secret)
 }
 
-const pair = async ({ uid, value: prev }) => {
-  const next = refresh.create({ uid })
-  await refresh.update({ uid, prev, next })
-  return { access: access.create({ uid }), refresh: next }
+const pair = async ({ uid, value: prv }) => {
+  const nxt = refresh.create({ uid })
+  await refresh.update({ uid, prv, nxt })
+  return { access: access.create({ uid }), refresh: nxt }
 }
 
 module.exports = { access, refresh, pair }

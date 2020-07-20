@@ -1,9 +1,9 @@
-const jwt = require('express-jwt')
-const { secret } = require('../config').jwt
+const expressJwt = require('express-jwt')
+const config = require('../config')
 
 
 module.exports = [
-  jwt({ secret }),
+  expressJwt({ secret: config.access.secret }),
   (err, req, res, next) => {
     if (err.name === 'UnauthorizedError') res.status(err.status).send(err)
     next()
